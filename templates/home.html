@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home Page - NewsPortal{% endblock %}
+
+{% block content %}
+
+<!-- FEATURED ARTICLE -->
+{% if featured %}
+<section class="featured-section">
+    <a href="{% url 'article_detail' featured.pk %}" class="featured-card">
+        <div class="featured-badge">⭐ TOP NEWS</div>
+        <div class="featured-overlay"></div>
+        <div class="featured-content">
+            {% if featured.category %}
+            <span class="article-category">{{ featured.category.name }}</span>
+            {% endif %}
+            <h1 class="featured-title">{{ featured.title }}</h1>
+            <p class="featured-meta">
+                {% if featured.author %}✍️ {{ featured.author.name }} &nbsp;|&nbsp;{% endif %}
+                📅 {{ featured.published_date|date:"d M Y" }} &nbsp;|&nbsp;
+                👁️ {{ featured.views }} views
+            </p>
+            <p class="featured-excerpt">{{ featured.content|truncatewords:25 }}</p>
+            <span class="btn-read">Read more →</span>
+        </div>
+    </a>
+</section>
+{% endif %}
+
+<!-- ADVERTISEMENT BANNER -->
+{% if ads %}
+<section class="ads-section">
+    {% for ad in ads %}
+    <div class="ad-banner">
+        <span class="ad-label">Advertisement</span>
+        <p class="ad-advertiser">{{ ad.advertiser_name }}</p>
+        <p class="ad-content">{{ ad.content|truncatewords:15 }}</p>
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+<!-- MAIN LAYOUT: Articles + Sidebar -->
+<div class="content-layout">
+
+    <!-- ARTICLES GRID -->
+    <section class="articles-section">
+        <div class="section-header">
+            <h2 class="section-title">🗞️ Latest News</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="articles-grid">
+            {% for article in articles %}
+            <article class="article-card">
+                <div class="article-card-img">
+                    <div class="article-placeholder">📰</div>
+                    {% if article.category %}
+                    <span class="article-cat-badge">{{ article.category.name }}</span>
+                    {% endif %}
+                </div>
+                <div class="article-card-body">
+                    <h3 class="article-card-title">
+                        <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a>
+                    </h3>
+                    <p class="article-card-excerpt">{{ article.content|truncatewords:18 }}</p>
+                    <div class="article-card-meta">
+                        <span>{% if article.author %}✍️ {{ article.author.name }}{% endif %}</span>
+                        <span>👁️ {{ article.views }}</span>
+                        <span>📅 {{ article.published_date|date:"d M" }}</span>
+                    </div>
+                    <a href="{% url 'article_detail' article.pk %}" class="article-read-more">Read more →</a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <p>No articles found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <!-- LATEST NEWS -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title">🔥 Latest News</h3>
+            <ul class="latest-list">
+                {% for article in latest %}
+                <li class="latest-item">
+                    <div class="latest-num">{{ forloop.counter }}</div>
+                    <div>
+                        <a href="{% url 'article_detail' article.pk %}" class="latest-link">{{ article.title|truncatewords:8 }}</a>
+                        <p class="latest-date">📅 {{ article.published_date|date:"d M Y" }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div class="sidebar-widget">
+            <h3 class="widget-title">📂 Categories</h3>
+            <ul class="category-list">
+                {% for cat in categories %}
+                <li>
+                    <a href="{% url 'category_articles' cat.pk %}" class="category-link">
+                        <span>{{ cat.name }}</span>
+                        <span class="cat-count">{{ cat.articles.count }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- SUBSCRIBE WIDGET -->
+        <div class="sidebar-widget subscribe-widget">
+            <h3 class="widget-title">📧 Subscribe</h3>
+            <p>Get the latest news delivered to your inbox!</p>
+            <a href="{% url 'subscribe' %}" class="btn-subscribe full-width">Subscribe now →</a>
+        </div>
+
+    </aside>
+</div>
+
+{% endblock %}

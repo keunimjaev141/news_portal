@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscribe - NewsPortal{% endblock %}
+
+{% block content %}
+<div class="subscribe-page">
+    <div class="subscribe-hero">
+        <div class="subscribe-icon">📧</div>
+        <h1 class="subscribe-heading">Subscribe to NewsPortal</h1>
+        <p class="subscribe-sub">Stay up to date with the latest news. Choose a plan that works for you.</p>
+    </div>
+
+    {% if success %}
+    <div class="alert-success">
+        <span class="alert-icon">✅</span>
+        <div>
+            <strong>You are subscribed!</strong>
+            <p>Thank you for subscribing. You'll receive the latest news in your inbox.</p>
+        </div>
+    </div>
+    {% else %}
+
+    <!-- PLAN CARDS -->
+    <div class="plan-cards">
+        <div class="plan-card">
+            <div class="plan-badge free">Free</div>
+            <div class="plan-price">$0<span>/mo</span></div>
+            <ul class="plan-features">
+                <li>✅ 5 articles/day</li>
+                <li>✅ Breaking news alerts</li>
+                <li>❌ Ad-free experience</li>
+                <li>❌ Premium content</li>
+            </ul>
+        </div>
+        <div class="plan-card featured-plan">
+            <div class="plan-popular">Most Popular</div>
+            <div class="plan-badge basic">Basic</div>
+            <div class="plan-price">$4.99<span>/mo</span></div>
+            <ul class="plan-features">
+                <li>✅ Unlimited articles</li>
+                <li>✅ Breaking news alerts</li>
+                <li>✅ Ad-free experience</li>
+                <li>❌ Premium content</li>
+            </ul>
+        </div>
+        <div class="plan-card">
+            <div class="plan-badge premium">Premium</div>
+            <div class="plan-price">$9.99<span>/mo</span></div>
+            <ul class="plan-features">
+                <li>✅ Unlimited articles</li>
+                <li>✅ Breaking news alerts</li>
+                <li>✅ Ad-free experience</li>
+                <li>✅ Exclusive premium content</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SUBSCRIBE FORM -->
+    <div class="subscribe-form-wrap">
+        <h2>Create your account</h2>
+        <form method="POST" class="subscribe-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_name">Full Name</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label for="id_email">Email Address</label>
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label for="id_plan_type">Choose Plan</label>
+                {{ form.plan_type }}
+            </div>
+            {% if form.errors %}
+            <div class="form-errors">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <p class="form-error">⚠️ {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <button type="submit" class="btn-submit full-width">Subscribe now →</button>
+        </form>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}

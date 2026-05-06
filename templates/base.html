@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}News Portal{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <a href="{% url 'home' %}">
+                        <span class="logo-icon">📰</span>
+                        <span class="logo-text">NewsPortal</span>
+                    </a>
+                </div>
+                <form class="search-form" action="{% url 'search' %}" method="GET">
+                    <input type="text" name="q" placeholder="Search news..." class="search-input"
+                        value="{{ request.GET.q }}">
+                    <button type="submit" class="search-btn">🔍</button>
+                </form>
+                <div class="header-actions">
+                    <a href="{% url 'subscribe' %}" class="btn-subscribe">Subscribe</a>
+                </div>
+            </div>
+
+            <nav class="navbar">
+                <ul class="nav-list">
+                    <li><a href="{% url 'home' %}"
+                            class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">🏠 Main
+                            page</a></li>
+                    {% for cat in categories %}
+                    <li>
+                        <a href="{% url 'category_articles' cat.pk %}" class="nav-link">{{ cat.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3 class="footer-logo">📰 NewsPortal</h3>
+                    <p class="footer-desc">Latest news</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Categories</h4>
+                    <ul class="footer-links">
+                        {% for cat in categories %}
+                        <li><a href="{% url 'category_articles' cat.pk %}">{{ cat.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}">Home page</a></li>
+                        <li><a href="{% url 'subscribe' %}">Subscribe</a></li>
+                        <li><a href="{% url 'search' %}">Search</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Subscribe</h4>
+                    <p>Get the latest news first!</p>
+                    <a href="{% url 'subscribe' %}" class="btn-subscribe mt-10">Subscribe</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 NewsPortal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - NewsPortal{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+
+    <!-- ARTICLE -->
+    <article class="article-detail">
+        <div class="article-detail-header">
+            {% if article.category %}
+            <a href="{% url 'category_articles' article.category.pk %}" class="article-category-link">
+                {{ article.category.name }}
+            </a>
+            {% endif %}
+            <h1 class="article-detail-title">{{ article.title }}</h1>
+            <div class="article-detail-meta">
+                {% if article.author %}
+                <a href="{% url 'journalist_detail' article.author.pk %}" class="meta-author">
+                    ✍️ {{ article.author.name }}
+                </a>
+                {% endif %}
+                <span>📅 {{ article.published_date|date:"d M Y, H:i" }}</span>
+                <span>👁️ {{ article.views }} views</span>
+                <span>💬 {{ comments.count }} comments</span>
+            </div>
+        </div>
+
+        {% if ads %}
+        <div class="article-ad">
+            {% for ad in ads %}
+            <div class="ad-inline">
+                <span class="ad-label">Advertisement: {{ ad.advertiser_name }}</span>
+                <p>{{ ad.content }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="article-detail-content">
+            {{ article.content|linebreaks }}
+        </div>
+
+        <!-- COMMENTS -->
+        <div class="comments-section">
+            <h3 class="comments-title">💬 Comments ({{ comments.count }})</h3>
+
+            {% for comment in comments %}
+            <div class="comment-card">
+                <div class="comment-avatar">{{ comment.user.name|first|upper }}</div>
+                <div class="comment-body">
+                    <div class="comment-header">
+                        <strong>{{ comment.user.name }}</strong>
+                        <span class="comment-date">{{ comment.timestamp|date:"d M Y, H:i" }}</span>
+                    </div>
+                    <p class="comment-text">{{ comment.content }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-comments">No comments yet. Be the first!</p>
+            {% endfor %}
+
+            <!-- COMMENT FORM -->
+            <div class="comment-form-section">
+                <h4>✏️ Leave a comment</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        {{ comment_form.name }}
+                        {{ comment_form.email }}
+                    </div>
+                    {{ comment_form.content }}
+                    <button type="submit" class="btn-submit">Submit comment</button>
+                </form>
+            </div>
+        </div>
+    </article>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-widget">
+            <h3 class="widget-title">📌 Related articles</h3>
+            <ul class="related-list">
+                {% for rel in related %}
+                <li class="related-item">
+                    <a href="{% url 'article_detail' rel.pk %}" class="related-link">
+                        {{ rel.title|truncatewords:8 }}
+                    </a>
+                    <span class="related-date">{{ rel.published_date|date:"d M" }}</span>
+                </li>
+                {% empty %}
+                <li>No related articles found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if article.author %}
+        <div class="sidebar-widget">
+            <h3 class="widget-title">✍️ About the author</h3>
+            <div class="author-card">
+                <div class="author-avatar">{{ article.author.name|first|upper }}</div>
+                <div>
+                    <strong>{{ article.author.name }}</strong>
+                    <p>{{ article.author.email }}</p>
+                    <a href="{% url 'journalist_detail' article.author.pk %}" class="author-link">All articles →</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="sidebar-widget subscribe-widget">
+            <h3 class="widget-title">📧 Subscribe</h3>
+            <a href="{% url 'subscribe' %}" class="btn-subscribe full-width">Subscribe →</a>
+        </div>
+    </aside>
+</div>
+{% endblock %}
