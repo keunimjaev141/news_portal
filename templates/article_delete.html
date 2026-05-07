@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete - {{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-box">
+        <h2>🗑️ Delete article</h2>
+        <p style="margin-bottom:20px; color: var(--gray-600);">
+            "<strong>{{ article.title }}</strong>" article delete?
+        </p>
+        <form method="POST">
+            {% csrf_token %}
+            <div style="display:flex; gap:12px;">
+                <button type="submit" class="btn-submit" style="background:#e74c3c;">
+                    Yes, delete
+                </button>
+                <a href="{% url 'article_detail' article.pk %}" class="btn-submit" style="background:var(--gray-600);">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

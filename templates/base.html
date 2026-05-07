@@ -15,6 +15,24 @@
 <body>
 
     <!-- HEADER -->
+    <div class="header-actions">
+    {% if user.is_authenticated %}
+        <span class="user-name">👤 {{ user.username }}</span>
+        <a href="{% url 'logout' %}" class="btn-logout">Chiqish</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="btn-login">Kirish</a>
+        <a href="{% url 'register' %}" class="btn-subscribe">Ro'yxat</a>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <span class="user-name">👤 {{ user.username }}</span>
+    <a href="{% url 'article_create' %}" class="btn-subscribe">+ Maqola yoz</a>
+    <a href="{% url 'my_articles' %}" class="btn-login">Maqolalarim</a>
+    <a href="{% url 'logout' %}" class="btn-logout">Chiqish</a>
+    {% else %}
+    <a href="{% url 'login' %}" class="btn-login">Kirish</a>
+    <a href="{% url 'register' %}" class="btn-subscribe">Ro'yxat</a>
+    {% endif %}
+    </div>
     <header class="header">
         <div class="container">
             <div class="header-top">

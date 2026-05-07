@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Ro'yxatdan o'tish{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-box">
+        <h2>📝 Ro'yxatdan o'tish</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="form-error">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn-submit full-width">Ro'yxatdan o'tish</button>
+        </form>
+        <p class="auth-link">Akkauntingiz bormi? <a href="{% url 'login' %}">Kirish</a></p>
+    </div>
+</div>
+{% endblock %}

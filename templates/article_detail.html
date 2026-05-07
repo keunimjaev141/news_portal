@@ -9,6 +9,9 @@
     <!-- ARTICLE -->
     <article class="article-detail">
         <div class="article-detail-header">
+            {% if article.image %}
+            <img src="{{ article.image.url }}" alt="{{ article.title }}" class="article-detail-img">
+            {% endif %}
             {% if article.category %}
             <a href="{% url 'category_articles' article.category.pk %}" class="article-category-link">
                 {{ article.category.name }}
@@ -25,6 +28,12 @@
                 <span>👁️ {{ article.views }} views</span>
                 <span>💬 {{ comments.count }} comments</span>
             </div>
+            {% if user == article.created_by %}
+            <div class="article-owner-actions">
+                <a href="{% url 'article_edit' article.pk %}" class="btn-edit">✏️ Edit</a>
+                <a href="{% url 'article_delete' article.pk %}" class="btn-delete">🗑️ Delete</a>
+            </div>
+            {% endif %}
         </div>
 
         {% if ads %}
@@ -35,6 +44,12 @@
                 <p>{{ ad.content }}</p>
             </div>
             {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if article.image %}
+        <div class="article-detail-image">
+            <img src="{{ article.image.url }}" alt="{{ article.title }}">
         </div>
         {% endif %}
 

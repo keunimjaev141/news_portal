@@ -2,6 +2,85 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from .models import NewsArticle, Category, Comment, User, Journalist, Advertisement, Subscription
 from .forms import CommentForm, SubscribeForm
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User as AuthUser
+from .forms import RegisterForm
+from django.contrib.auth.decorators import login_required
+from .forms import ArticleForm
+
+@login_required(login_url='login')
+def article_create(request):
+    form = ArticleForm()
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, request.FILES)
+        if form.is_valid():
+            article = NewsArticle.objects.create(
+                title=form.cleaned_data['title'],
+                content=form.cleaned_data['content'],
+                category=form.cleaned_data['category'],
+                image=form.cleaned_data.get('image'),
+                created_by=request.user,
+            )
+            return redirect('article_detail', pk=article.pk)
+    return render(request, 'article_create.html', {'form': form})
+
+@login_required(login_url='login')
+def article_edit(request, pk):
+    article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+    form = ArticleForm(initial={
+        'title': article.title,
+        'content': article.content,
+        'category': article.category,
+    })
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, request.FILES)
+        if form.is_valid():
+            article.title = form.cleaned_data['title']
+            article.content = form.cleaned_data['content']
+            article.category = form.cleaned_data['category']
+            if form.cleaned_data.get('image'):
+                article.image = form.cleaned_data['image']
+            article.save()
+            return redirect('article_detail', pk=article.pk)
+    return render(request, 'article_create.html', {'form': form, 'edit': True})
+
+@login_required(login_url='login')
+def article_delete(request, pk):
+    article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+    if request.method == 'POST':
+        article.delete()
+        return redirect('home')
+    return render(request, 'article_delete.html', {'article': article})
+
+@login_required(login_url='login')
+def my_articles(request):
+    articles = NewsArticle.objects.filter(created_by=request.user).order_by('-published_date')
+    return render(request, 'my_articles.html', {'articles': articles})
+
+def register_view(request):
+    form = RegisterForm()
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    return render(request, 'register.html', {'form': form})
+
+def login_view(request):
+    form = AuthenticationForm()
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('home')
+    return render(request, 'login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 
 def home(request):

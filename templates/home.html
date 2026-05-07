@@ -54,9 +54,13 @@
             {% for article in articles %}
             <article class="article-card">
                 <div class="article-card-img">
-                    <div class="article-placeholder">📰</div>
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" alt="{{ article.title }}" class="article-img">
+                    {% else %}
+                        <div class="article-placeholder">📰</div>
+                    {% endif %}
                     {% if article.category %}
-                    <span class="article-cat-badge">{{ article.category.name }}</span>
+                        <span class="article-cat-badge">{{ article.category.name }}</span>
                     {% endif %}
                 </div>
                 <div class="article-card-body">

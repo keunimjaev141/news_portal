@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User as AuthUser
 
 
 class Admin(models.Model):
@@ -80,10 +81,12 @@ class PortalCategory(models.Model):
 class NewsArticle(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
+    image = models.ImageField(upload_to='articles/')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='articles')
     author = models.ForeignKey(Journalist, on_delete=models.SET_NULL, null=True, related_name='articles')
     published_date = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
+    created_by = models.ForeignKey(AuthUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='my_articles')
 
     def __str__(self):
         return self.title
