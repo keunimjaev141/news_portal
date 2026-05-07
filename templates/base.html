@@ -16,22 +16,13 @@
 
     <!-- HEADER -->
     <div class="header-actions">
-    {% if user.is_authenticated %}
+        {% if user.is_authenticated %}
         <span class="user-name">👤 {{ user.username }}</span>
-        <a href="{% url 'logout' %}" class="btn-logout">Chiqish</a>
-    {% else %}
-        <a href="{% url 'login' %}" class="btn-login">Kirish</a>
-        <a href="{% url 'register' %}" class="btn-subscribe">Ro'yxat</a>
-    {% endif %}
-    {% if user.is_authenticated %}
-    <span class="user-name">👤 {{ user.username }}</span>
-    <a href="{% url 'article_create' %}" class="btn-subscribe">+ Maqola yoz</a>
-    <a href="{% url 'my_articles' %}" class="btn-login">Maqolalarim</a>
-    <a href="{% url 'logout' %}" class="btn-logout">Chiqish</a>
-    {% else %}
-    <a href="{% url 'login' %}" class="btn-login">Kirish</a>
-    <a href="{% url 'register' %}" class="btn-subscribe">Ro'yxat</a>
-    {% endif %}
+        <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn-login">Login</a>
+        <a href="{% url 'register' %}" class="btn-subscribe">Register</a>
+        {% endif %}
     </div>
     <header class="header">
         <div class="container">
@@ -46,10 +37,7 @@
                     <input type="text" name="q" placeholder="Search news..." class="search-input"
                         value="{{ request.GET.q }}">
                     <button type="submit" class="search-btn">🔍</button>
-                </form>
-                <div class="header-actions">
-                    <a href="{% url 'subscribe' %}" class="btn-subscribe">Subscribe</a>
-                </div>
+                    </form>
             </div>
 
             <nav class="navbar">
@@ -105,7 +93,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 NewsPortal. All rights reserved.</p>
+                <p>&copy; 2026 NewsPortal. All rights reserved.</p>
             </div>
         </div>
     </footer>

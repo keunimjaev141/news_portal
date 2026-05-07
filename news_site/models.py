@@ -86,7 +86,6 @@ class NewsArticle(models.Model):
     author = models.ForeignKey(Journalist, on_delete=models.SET_NULL, null=True, related_name='articles')
     published_date = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
-    created_by = models.ForeignKey(AuthUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='my_articles')
 
     def __str__(self):
         return self.title
