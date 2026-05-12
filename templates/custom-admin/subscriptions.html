@@ -1,0 +1,35 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% block title %}Subscriptions{% endblock %}
+{% block page_title %}Subscriptions{% endblock %}
+
+{% block content %}
+<div class="admin-table-wrap">
+    <div class="admin-table-header">
+        <h2>⭐ Subscriptions ({{ subs.count }})</h2>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr><th>#</th><th>User</th><th>Plan</th><th>Start</th><th>End</th></tr>
+        </thead>
+        <tbody>
+            {% for s in subs %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ s.user.name }}</strong></td>
+                <td>
+                    {% if s.plan_type == 'premium' %}
+                        <span class="badge badge-amber">Premium</span>
+                    {% elif s.plan_type == 'basic' %}
+                        <span class="badge badge-accent">Basic</span>
+                    {% else %}
+                        <span class="badge badge-green">Free</span>
+                    {% endif %}
+                </td>
+                <td>{{ s.start_date|date:"d M Y" }}</td>
+                <td>{{ s.end_date|date:"d M Y"|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

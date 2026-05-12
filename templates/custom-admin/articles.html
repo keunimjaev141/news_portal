@@ -1,0 +1,42 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% block title %}Maqolalar{% endblock %}
+{% block page_title %}Maqolalar boshqaruvi{% endblock %}
+
+{% block content %}
+<div class="admin-table-wrap">
+    <div class="admin-table-header">
+        <h2>📰 All articles ({{ articles.count }})</h2>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Author</th>
+                <th>Views</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in articles %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong><a href="{% url 'article_detail' a.pk %}" style="color:var(--text-1);">{{ a.title|truncatewords:7 }}</a></strong></td>
+                <td><span class="badge badge-accent">{{ a.category.name|default:"—" }}</span></td>
+                <td>{{ a.author.name|default:"—" }}</td>
+                <td>{{ a.views }}</td>
+                <td>{{ a.published_date|date:"d M Y" }}</td>
+                <td>
+                    <form method="POST" action="{% url 'admin_article_delete' a.pk %}" style="display:inline;" onsubmit="return confirm('O\'chirilsinmi?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-danger">🗑️ Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

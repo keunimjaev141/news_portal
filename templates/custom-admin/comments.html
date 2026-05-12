@@ -1,0 +1,40 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% block title %}Comments{% endblock %}
+{% block page_title %}Comments{% endblock %}
+
+{% block content %}
+<div class="admin-table-wrap">
+    <div class="admin-table-header">
+        <h2>💬 All comments ({{ comments.count }})</h2>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Article</th>
+                <th>Comment</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in comments %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ c.user.name }}</strong></td>
+                <td><a href="{% url 'article_detail' c.article.pk %}" style="color:var(--accent);">{{ c.article.title|truncatewords:5 }}</a></td>
+                <td>{{ c.content|truncatewords:10 }}</td>
+                <td>{{ c.timestamp|date:"d M Y" }}</td>
+                <td>
+                    <form method="POST" action="{% url 'admin_comment_delete' c.pk %}" style="display:inline;" onsubmit="return confirm('O\'chirilsinmi?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-danger">🗑️ Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

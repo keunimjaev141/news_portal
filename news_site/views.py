@@ -6,7 +6,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User as AuthUser
 from .forms import RegisterForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 
 def register_view(request):
     form = RegisterForm()
@@ -25,6 +25,8 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            if user.is_staff or user.is_superuser:
+                return redirect('custom_admin_dashboard')
             return redirect('home')
     return render(request, 'login.html', {'form': form})
 
@@ -127,3 +129,83 @@ def subscribe(request):
             success = True
     context = {'form': form, 'success': success}
     return render(request, 'subscribe.html', context)
+
+
+def admin_required(view_func):
+    decorated = login_required(login_url='login')(
+        staff_member_required(login_url='login')(view_func)
+    )
+    return decorated
+
+@admin_required
+def custom_admin_dashboard(request):
+    context = {
+        'total_articles': NewsArticle.objects.count(),
+        'total_users': User.objects.count(),
+        'total_comments': Comment.objects.count(),
+        'total_subscriptions': Subscription.objects.count(),
+        'total_journalists': Journalist.objects.count(),
+        'total_categories': Category.objects.count(),
+        'latest_articles': NewsArticle.objects.order_by('-published_date')[:5],
+        'latest_comments': Comment.objects.order_by('-timestamp')[:5],
+    }
+    return render(request, 'custom_admin/dashboard.html', context)
+
+
+@admin_required
+def admin_articles(request):
+    articles = NewsArticle.objects.select_related('category', 'author').order_by('-published_date')
+    return render(request, 'custom_admin/articles.html', {'articles': articles})
+
+
+@admin_required
+def admin_article_delete(request, pk):
+    article = get_object_or_404(NewsArticle, pk=pk)
+    if request.method == 'POST':
+        article.delete()
+        return redirect('admin_articles')
+    return render(request, 'custom_admin/confirm_delete.html', {'obj': article, 'type': 'maqola'})
+
+
+@admin_required
+def admin_users(request):
+    from django.contrib.auth.models import User as AuthUser
+    users = AuthUser.objects.all().order_by('-date_joined')
+    return render(request, 'custom_admin/users.html', {'users': users})
+
+
+@admin_required
+def admin_user_toggle_staff(request, pk):
+    from django.contrib.auth.models import User as AuthUser
+    user = get_object_or_404(AuthUser, pk=pk)
+    if request.method == 'POST':
+        user.is_staff = not user.is_staff
+        user.save()
+    return redirect('admin_users')
+
+
+@admin_required
+def admin_comments(request):
+    comments = Comment.objects.select_related('user', 'article').order_by('-timestamp')
+    return render(request, 'custom_admin/comments.html', {'comments': comments})
+
+
+@admin_required
+def admin_comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.method == 'POST':
+        comment.delete()
+        return redirect('admin_comments')
+    return render(request, 'custom_admin/confirm_delete.html', {'obj': comment, 'type': 'izoh'})
+
+
+@admin_required
+def admin_categories(request):
+    categories = Category.objects.all()
+    return render(request, 'custom_admin/categories.html', {'categories': categories})
+
+
+@admin_required
+def admin_subscriptions(request):
+    subs = Subscription.objects.select_related('user').order_by('-start_date')
+    return render(request, 'custom_admin/subscriptions.html', {'subs': subs})

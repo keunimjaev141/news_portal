@@ -1,0 +1,95 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- STATISTIKA -->
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📰</div>
+        <div class="stat-value">{{ total_articles }}</div>
+        <div class="stat-label">All articles</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👤</div>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-value">{{ total_comments }}</div>
+        <div class="stat-label">Comments</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-value">{{ total_subscriptions }}</div>
+        <div class="stat-label">Subscriptions</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">✍️</div>
+        <div class="stat-value">{{ total_journalists }}</div>
+        <div class="stat-label">Journalists</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📂</div>
+        <div class="stat-value">{{ total_categories }}</div>
+        <div class="stat-label">Categories</div>
+    </div>
+</div>
+
+<!-- SO'NGGI MAQOLALAR -->
+<div class="admin-table-wrap" style="margin-bottom: 24px;">
+    <div class="admin-table-header">
+        <h2>🕐 Latest articles</h2>
+        <a href="{% url 'admin_articles' %}" class="btn-accent">All →</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Views</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in latest_articles %}
+            <tr>
+                <td><strong><a href="{% url 'article_detail' a.pk %}" style="color: var(--text-1);">{{ a.title|truncatewords:6 }}</a></strong></td>
+                <td><span class="badge badge-accent">{{ a.category.name|default:"—" }}</span></td>
+                <td>👁️ {{ a.views }}</td>
+                <td>{{ a.published_date|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- SO'NGGI IZOHLAR -->
+<div class="admin-table-wrap">
+    <div class="admin-table-header">
+        <h2>💬 Latest comments</h2>
+        <a href="{% url 'admin_comments' %}" class="btn-accent">All →</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Article</th>
+                <th>Comment</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in latest_comments %}
+            <tr>
+                <td><strong>{{ c.user.name }}</strong></td>
+                <td>{{ c.article.title|truncatewords:5 }}</td>
+                <td>{{ c.content|truncatewords:8 }}</td>
+                <td>{{ c.timestamp|date:"d M" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

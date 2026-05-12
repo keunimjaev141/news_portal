@@ -1,0 +1,52 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% block title %}Users{% endblock %}
+{% block page_title %}Users{% endblock %}
+
+{% block content %}
+<div class="admin-table-wrap">
+    <div class="admin-table-header">
+        <h2>👤 All users ({{ users.count }})</h2>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ u.username }}</strong></td>
+                <td>{{ u.email|default:"—" }}</td>
+                <td>
+                    {% if u.is_superuser %}
+                        <span class="badge badge-amber">Superadmin</span>
+                    {% elif u.is_staff %}
+                        <span class="badge badge-accent">Admin</span>
+                    {% else %}
+                        <span class="badge badge-green">User</span>
+                    {% endif %}
+                </td>
+                <td>{{ u.date_joined|date:"d M Y" }}</td>
+                <td>
+                    {% if not u.is_superuser %}
+                    <form method="POST" action="{% url 'admin_user_toggle_staff' u.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-accent">
+                            {% if u.is_staff %}Remove admin{% else %}Make admin{% endif %}
+                        </button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

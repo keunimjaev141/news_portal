@@ -1,0 +1,26 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% block title %}Categories{% endblock %}
+{% block page_title %}Categories{% endblock %}
+
+{% block content %}
+<div class="admin-table-wrap">
+    <div class="admin-table-header">
+        <h2>📂 Categories ({{ categories.count }})</h2>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr><th>#</th><th>Name</th><th>Description</th><th>Articles count</th></tr>
+        </thead>
+        <tbody>
+            {% for cat in categories %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ cat.name }}</strong></td>
+                <td>{{ cat.description|default:"—"|truncatewords:10 }}</td>
+                <td><span class="badge badge-accent">{{ cat.articles.count }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
