@@ -9,19 +9,19 @@ class CommentForm(forms.Form):
         max_length=100,
         widget=forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Ismingiz'
+            'placeholder': 'Name'
         })
     )
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Email manzilingiz'
+            'placeholder': 'Email address'
         })
     )
     content = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-textarea',
-            'placeholder': 'Izohingizni yozing...',
+            'placeholder': 'Writing comment...',
             'rows': 4
         })
     )
@@ -37,13 +37,13 @@ class SubscribeForm(forms.Form):
         max_length=100,
         widget=forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': "To'liq ismingiz"
+            'placeholder': 'Full name'
         })
     )
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Email manzilingiz'
+            'placeholder': 'Email address'
         })
     )
     plan_type = forms.ChoiceField(
@@ -57,7 +57,7 @@ class RegisterForm(UserCreationForm):
         required=True,
         widget=forms.EmailInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Email manzilingiz'
+            'placeholder': 'Email address'
         })
     )
 
@@ -69,15 +69,15 @@ class RegisterForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({
             'class': 'form-input',
-            'placeholder': 'Foydalanuvchi nomi'
+            'placeholder': 'Username'
         })
         self.fields['password1'].widget.attrs.update({
             'class': 'form-input',
-            'placeholder': 'Parol (kamida 8 belgi)'
+            'placeholder': 'Password (min 8 characters)'
         })
         self.fields['password2'].widget.attrs.update({
             'class': 'form-input',
-            'placeholder': 'Parolni takrorlang'
+            'placeholder': 'Repeat password'
         })
         for field in self.fields.values():
             field.help_text = None
@@ -88,20 +88,20 @@ class ArticleForm(forms.Form):
         max_length=255,
         widget=forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Maqola sarlavhasi'
+            'placeholder': 'Article title'
         })
     )
     content = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-textarea',
-            'placeholder': 'Maqola matni...',
+            'placeholder': 'Article content...',
             'rows': 10
         })
     )
     category = forms.ModelChoiceField(
         queryset=Category.objects.all(),
         widget=forms.Select(attrs={'class': 'form-select'}),
-        empty_label='Kategoriya tanlang'
+        empty_label='Select category'
     )
     image = forms.ImageField(
         required=False,

@@ -1,6 +1,6 @@
 {% extends 'custom_admin/base_admin.html' %}
-{% block title %}Maqolalar{% endblock %}
-{% block page_title %}Maqolalar boshqaruvi{% endblock %}
+{% block title %}All articles{% endblock %}
+{% block page_title %}All articles{% endblock %}
 
 {% block content %}
 <div class="admin-table-wrap">
@@ -31,13 +31,21 @@
                     </strong>
                 </td>
                 <td><span class="badge badge-accent">{{ a.category.name|default:"—" }}</span></td>
-                <td>{{ a.author.name|default:a.created_by.username|default:"—" }}</td>
+                <td>
+                    {% if a.author %}
+                        {{ a.author.name }}
+                    {% elif a.created_by %}
+                        {{ a.created_by.username }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
                 <td>👁️ {{ a.views }}</td>
                 <td>{{ a.published_date|date:"d M Y" }}</td>
                 <td>
                     <form method="POST" action="{% url 'admin_article_delete' a.pk %}"
                           style="display:inline;"
-                          onsubmit="return confirm('Maqolani o\'chirishni tasdiqlaysizmi?')">
+                          onsubmit="return confirm('Are you sure you want to delete this article?')">
                         {% csrf_token %}
                         <button type="submit" class="btn-danger">🗑️ Delete</button>
                     </form>
