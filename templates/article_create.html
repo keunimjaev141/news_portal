@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if edit %}Edit article{% else %}Create article{% endif %}{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-box" style="max-width: 800px;">
+        <h2 style="text-align: left;">{% if edit %}✏️ Edit article{% else %}✍️ Create a new article{% endif %}</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-2);">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="form-error">{{ field.errors.0 }}</p>
+                {% endif %}
+                {% if field.help_text %}
+                <p style="font-size: 12px; color: var(--text-3); margin-top: 4px;">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button type="submit" class="btn-submit">{% if edit %}Save changes{% else %}Publish article{% endif %}</button>
+                <a href="{% url 'my_articles' %}" class="btn-read" style="margin-top: 0; padding: 12px 28px; border-radius: var(--radius);">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

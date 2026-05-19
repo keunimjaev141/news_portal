@@ -8,7 +8,7 @@
 <!-- FEATURED ARTICLE -->
 {% if featured %}
 <section class="featured-section">
-    <a href="{% url 'article_detail' featured.pk %}" class="featured-card">
+    <a href="{% url 'article_detail' featured.pk %}" class="featured-card" {% if featured.image %}style="background-image: url('{{ featured.image.url }}'); background-size: cover; background-position: center;"{% endif %}>
         <div class="featured-badge">⭐ TOP NEWS</div>
         <div class="featured-overlay"></div>
         <div class="featured-content">

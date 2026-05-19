@@ -1,6 +1,6 @@
 {% extends 'custom_admin/base_admin.html' %}
-{% block title %}Comments{% endblock %}
-{% block page_title %}Comments{% endblock %}
+{% block title %}Izohlar{% endblock %}
+{% block page_title %}Izohlar boshqaruvi{% endblock %}
 
 {% block content %}
 <div class="admin-table-wrap">
@@ -23,14 +23,26 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td><strong>{{ c.user.name }}</strong></td>
-                <td><a href="{% url 'article_detail' c.article.pk %}" style="color:var(--accent);">{{ c.article.title|truncatewords:5 }}</a></td>
+                <td>
+                    <a href="{% url 'article_detail' c.article.pk %}" style="color:var(--accent);">
+                        {{ c.article.title|truncatewords:5 }}
+                    </a>
+                </td>
                 <td>{{ c.content|truncatewords:10 }}</td>
                 <td>{{ c.timestamp|date:"d M Y" }}</td>
                 <td>
-                    <form method="POST" action="{% url 'admin_comment_delete' c.pk %}" style="display:inline;" onsubmit="return confirm('O\'chirilsinmi?')">
+                    <form method="POST" action="{% url 'admin_comment_delete' c.pk %}"
+                          style="display:inline;"
+                          onsubmit="return confirm('Izohni o\'chirishni tasdiqlaysizmi?')">
                         {% csrf_token %}
                         <button type="submit" class="btn-danger">🗑️ Delete</button>
                     </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align:center; padding:40px; color:var(--text-3);">
+                    No comments found
                 </td>
             </tr>
             {% endfor %}

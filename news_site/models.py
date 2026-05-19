@@ -2,32 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User as AuthUser
 
 
-class Admin(models.Model):
-    username = models.CharField(max_length=100)
-    email = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.username
-
-    class Meta:
-        db_table = 'admins'
-        verbose_name = 'Admin'
-        verbose_name_plural = 'Admins'
-
-
-class User(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'users'
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
-
-
 class Journalist(models.Model):
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100, unique=True)
@@ -63,8 +37,6 @@ class NewsPortal(models.Model):
 
     class Meta:
         db_table = 'news_portal'
-        verbose_name = 'News Portal'
-        verbose_name_plural = 'News Portals'
 
 
 class PortalCategory(models.Model):
@@ -74,16 +46,15 @@ class PortalCategory(models.Model):
     class Meta:
         db_table = 'portal_categories'
         unique_together = ('portal', 'category')
-        verbose_name = 'Portal Category'
-        verbose_name_plural = 'Portal Categories'
 
 
 class NewsArticle(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
-    image = models.ImageField(upload_to='articles/')
+    image = models.ImageField(upload_to='articles/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='articles')
-    author = models.ForeignKey(Journalist, on_delete=models.SET_NULL, null=True, related_name='articles')
+    author = models.ForeignKey(Journalist, on_delete=models.SET_NULL, null=True, blank=True, related_name='articles')
+    created_by = models.ForeignKey(AuthUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='my_articles')
     published_date = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
 
@@ -92,9 +63,18 @@ class NewsArticle(models.Model):
 
     class Meta:
         db_table = 'news_articles'
-        verbose_name = 'News Article'
-        verbose_name_plural = 'News Articles'
         ordering = ['-published_date']
+
+
+class User(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'users'
 
 
 class Comment(models.Model):
@@ -108,8 +88,6 @@ class Comment(models.Model):
 
     class Meta:
         db_table = 'comments'
-        verbose_name = 'Comment'
-        verbose_name_plural = 'Comments'
         ordering = ['-timestamp']
 
 
@@ -129,8 +107,6 @@ class Subscription(models.Model):
 
     class Meta:
         db_table = 'subscriptions'
-        verbose_name = 'Subscription'
-        verbose_name_plural = 'Subscriptions'
 
 
 class Advertisement(models.Model):
@@ -138,7 +114,7 @@ class Advertisement(models.Model):
     content = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    created_by = models.ForeignKey(Admin, on_delete=models.SET_NULL, null=True, related_name='advertisements')
+    created_by = models.ForeignKey(AuthUser, on_delete=models.SET_NULL, null=True, related_name='advertisements')
     article = models.ForeignKey(NewsArticle, on_delete=models.SET_NULL, null=True, blank=True, related_name='advertisements')
 
     def __str__(self):
@@ -146,5 +122,3 @@ class Advertisement(models.Model):
 
     class Meta:
         db_table = 'advertisements'
-        verbose_name = 'Advertisement'
-        verbose_name_plural = 'Advertisements'

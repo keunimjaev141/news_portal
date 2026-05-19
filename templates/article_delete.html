@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete article{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-box" style="text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 20px;">🗑️</div>
+        <h2>Are you sure you want to delete this article?</h2>
+        <p style="color: var(--text-3); margin-bottom: 30px;">
+            "{{ article.title }}"<br>
+            This action cannot be undone.
+        </p>
+        <form method="POST">
+            {% csrf_token %}
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="submit" class="btn-submit" style="background: var(--red); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);">
+                    Delete permanently
+                </button>
+                <a href="{% url 'my_articles' %}" class="btn-read" style="margin-top: 0; padding: 12px 28px; border-radius: var(--radius);">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

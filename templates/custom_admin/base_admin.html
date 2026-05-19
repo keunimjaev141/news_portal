@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel{% endblock %} | NewsPortal</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>NewsPortal Admin</span>
+            <small>Content Management System</small>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Main</div>
+            <a href="{% url 'custom_admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_dashboard' %}active{% endif %}">
+                <span class="nav-icon">📊</span> Dashboard
+            </a>
+            
+            <div class="nav-section-title">Content</div>
+            <a href="{% url 'admin_articles' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_articles' %}active{% endif %}">
+                <span class="nav-icon">📰</span> Articles
+            </a>
+            <a href="{% url 'admin_categories' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_categories' %}active{% endif %}">
+                <span class="nav-icon">📂</span> Categories
+            </a>
+            <a href="{% url 'admin_comments' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_comments' %}active{% endif %}">
+                <span class="nav-icon">💬</span> Comments
+            </a>
+
+            <div class="nav-section-title">System</div>
+            <a href="{% url 'admin_users' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+                <span class="nav-icon">👥</span> Users
+            </a>
+            <a href="{% url 'admin_subscriptions' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_subscriptions' %}active{% endif %}">
+                <span class="nav-icon">⭐</span> Subscriptions
+            </a>
+            <a href="/" class="nav-item">
+                <span class="nav-icon">🌐</span> View Site
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}" class="nav-item danger">
+                <span class="nav-icon">🚪</span> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+            <div class="topbar-user">
+                <div class="topbar-avatar">{{ user.username|first|upper }}</div>
+                <div class="topbar-info">
+                    <div class="topbar-name">{{ user.username }}</div>
+                    <div class="topbar-role">{% if user.is_superuser %}Superadmin{% else %}Staff{% endif %}</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="admin-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+</body>
+</html>

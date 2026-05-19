@@ -1,0 +1,25 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% block title %}O'chirish{% endblock %}
+{% block page_title %}O'chirishni tasdiqlash{% endblock %}
+
+{% block content %}
+<div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <h2>Are you sure you want to delete?</h2>
+    <p>
+        You are about to delete {{ type }} named {{ obj }}.<br>
+        This action cannot be undone!
+    </p>
+    <div class="confirm-actions">
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger" style="padding:10px 24px; font-size:0.9rem;">
+                Yes, delete
+            </button>
+        </form>
+        <a href="{% url back_url %}" class="btn-accent" style="padding:10px 24px; font-size:0.9rem;">
+            Cancel
+        </a>
+    </div>
+</div>
+{% endblock %}

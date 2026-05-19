@@ -1,12 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
-from .models import NewsArticle, Category, Comment, User, Journalist, Advertisement, Subscription
-from .forms import CommentForm, SubscribeForm
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User as AuthUser
-from .forms import RegisterForm
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from .models import (
+    NewsArticle, Category, Comment, User,
+    Journalist, Advertisement, Subscription
+)
+from .forms import CommentForm, SubscribeForm, RegisterForm, ArticleForm
+
+def admin_required(view_func):
+    def wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not (request.user.is_staff or request.user.is_superuser):
+            return redirect('login')
+        return view_func(request, *args, **kwargs)
+    return wrapped
 
 def register_view(request):
     form = RegisterForm()
@@ -17,6 +28,7 @@ def register_view(request):
             login(request, user)
             return redirect('home')
     return render(request, 'register.html', {'form': form})
+
 
 def login_view(request):
     form = AuthenticationForm()
@@ -30,10 +42,10 @@ def login_view(request):
             return redirect('home')
     return render(request, 'login.html', {'form': form})
 
+
 def logout_view(request):
     logout(request)
     return redirect('home')
-
 
 def home(request):
     articles = NewsArticle.objects.select_related('category', 'author').all()[:12]
@@ -59,6 +71,7 @@ def article_detail(request, pk):
     related = NewsArticle.objects.filter(category=article.category).exclude(pk=pk)[:4]
     ads = Advertisement.objects.filter(article=article)
     comment_form = CommentForm()
+
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
@@ -68,6 +81,7 @@ def article_detail(request, pk):
             user, _ = User.objects.get_or_create(email=email, defaults={'name': name})
             Comment.objects.create(user=user, article=article, content=content)
             return redirect('article_detail', pk=pk)
+
     context = {
         'article': article,
         'comments': comments,
@@ -127,34 +141,79 @@ def subscribe(request):
             user, _ = User.objects.get_or_create(email=email, defaults={'name': name})
             Subscription.objects.create(user=user, plan_type=plan)
             success = True
-    context = {'form': form, 'success': success}
-    return render(request, 'subscribe.html', context)
+    return render(request, 'subscribe.html', {'form': form, 'success': success})
 
 
-def admin_required(view_func):
-    decorated = login_required(login_url='login')(
-        staff_member_required(login_url='login')(view_func)
-    )
-    return decorated
+@login_required(login_url='login')
+def article_create(request):
+    form = ArticleForm()
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, request.FILES)
+        if form.is_valid():
+            article = NewsArticle.objects.create(
+                title=form.cleaned_data['title'],
+                content=form.cleaned_data['content'],
+                category=form.cleaned_data['category'],
+                image=form.cleaned_data.get('image'),
+                created_by=request.user,
+            )
+            return redirect('article_detail', pk=article.pk)
+    return render(request, 'article_create.html', {'form': form})
+
+
+@login_required(login_url='login')
+def article_edit(request, pk):
+    article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+    form = ArticleForm(initial={
+        'title': article.title,
+        'content': article.content,
+        'category': article.category,
+    })
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, request.FILES)
+        if form.is_valid():
+            article.title = form.cleaned_data['title']
+            article.content = form.cleaned_data['content']
+            article.category = form.cleaned_data['category']
+            if form.cleaned_data.get('image'):
+                article.image = form.cleaned_data['image']
+            article.save()
+            return redirect('article_detail', pk=article.pk)
+    return render(request, 'article_create.html', {'form': form, 'edit': True})
+
+
+@login_required(login_url='login')
+def article_delete(request, pk):
+    article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+    if request.method == 'POST':
+        article.delete()
+        return redirect('home')
+    return render(request, 'article_delete.html', {'article': article})
+
+
+@login_required(login_url='login')
+def my_articles(request):
+    articles = NewsArticle.objects.filter(created_by=request.user).order_by('-published_date')
+    return render(request, 'my_articles.html', {'articles': articles})
 
 @admin_required
 def custom_admin_dashboard(request):
     context = {
         'total_articles': NewsArticle.objects.count(),
-        'total_users': User.objects.count(),
+        'total_users': AuthUser.objects.count(),
         'total_comments': Comment.objects.count(),
         'total_subscriptions': Subscription.objects.count(),
         'total_journalists': Journalist.objects.count(),
         'total_categories': Category.objects.count(),
-        'latest_articles': NewsArticle.objects.order_by('-published_date')[:5],
-        'latest_comments': Comment.objects.order_by('-timestamp')[:5],
+        'latest_articles': NewsArticle.objects.select_related('category', 'author').order_by('-published_date')[:5],
+        'latest_comments': Comment.objects.select_related('user', 'article').order_by('-timestamp')[:5],
     }
     return render(request, 'custom_admin/dashboard.html', context)
 
 
 @admin_required
 def admin_articles(request):
-    articles = NewsArticle.objects.select_related('category', 'author').order_by('-published_date')
+    articles = NewsArticle.objects.select_related('category', 'author', 'created_by').order_by('-published_date')
     return render(request, 'custom_admin/articles.html', {'articles': articles})
 
 
@@ -164,21 +223,23 @@ def admin_article_delete(request, pk):
     if request.method == 'POST':
         article.delete()
         return redirect('admin_articles')
-    return render(request, 'custom_admin/confirm_delete.html', {'obj': article, 'type': 'maqola'})
+    return render(request, 'custom_admin/confirm_delete.html', {
+        'obj': article,
+        'type': 'maqola',
+        'back_url': 'admin_articles'
+    })
 
 
 @admin_required
 def admin_users(request):
-    from django.contrib.auth.models import User as AuthUser
     users = AuthUser.objects.all().order_by('-date_joined')
     return render(request, 'custom_admin/users.html', {'users': users})
 
 
 @admin_required
 def admin_user_toggle_staff(request, pk):
-    from django.contrib.auth.models import User as AuthUser
     user = get_object_or_404(AuthUser, pk=pk)
-    if request.method == 'POST':
+    if request.method == 'POST' and not user.is_superuser:
         user.is_staff = not user.is_staff
         user.save()
     return redirect('admin_users')
@@ -196,7 +257,11 @@ def admin_comment_delete(request, pk):
     if request.method == 'POST':
         comment.delete()
         return redirect('admin_comments')
-    return render(request, 'custom_admin/confirm_delete.html', {'obj': comment, 'type': 'izoh'})
+    return render(request, 'custom_admin/confirm_delete.html', {
+        'obj': comment,
+        'type': 'izoh',
+        'back_url': 'admin_comments'
+    })
 
 
 @admin_required

@@ -3,12 +3,12 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<!-- STATISTIKA -->
+
 <div class="stat-grid">
     <div class="stat-card">
         <div class="stat-icon">📰</div>
         <div class="stat-value">{{ total_articles }}</div>
-        <div class="stat-label">All articles</div>
+        <div class="stat-label">Articles</div>
     </div>
     <div class="stat-card">
         <div class="stat-icon">👤</div>
@@ -37,8 +37,7 @@
     </div>
 </div>
 
-<!-- SO'NGGI MAQOLALAR -->
-<div class="admin-table-wrap" style="margin-bottom: 24px;">
+<div class="admin-table-wrap" style="margin-bottom:24px;">
     <div class="admin-table-header">
         <h2>🕐 Latest articles</h2>
         <a href="{% url 'admin_articles' %}" class="btn-accent">All →</a>
@@ -46,6 +45,7 @@
     <table class="admin-table">
         <thead>
             <tr>
+                <th>#</th>
                 <th>Title</th>
                 <th>Category</th>
                 <th>Views</th>
@@ -55,17 +55,19 @@
         <tbody>
             {% for a in latest_articles %}
             <tr>
-                <td><strong><a href="{% url 'article_detail' a.pk %}" style="color: var(--text-1);">{{ a.title|truncatewords:6 }}</a></strong></td>
+                <td>{{ forloop.counter }}</td>
+                <td><strong><a href="{% url 'article_detail' a.pk %}" style="color:var(--text-1);">{{ a.title|truncatewords:6 }}</a></strong></td>
                 <td><span class="badge badge-accent">{{ a.category.name|default:"—" }}</span></td>
                 <td>👁️ {{ a.views }}</td>
                 <td>{{ a.published_date|date:"d M Y" }}</td>
             </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;color:var(--text-3);">No articles found</td></tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-<!-- SO'NGGI IZOHLAR -->
 <div class="admin-table-wrap">
     <div class="admin-table-header">
         <h2>💬 Latest comments</h2>
@@ -74,6 +76,7 @@
     <table class="admin-table">
         <thead>
             <tr>
+                <th>#</th>
                 <th>User</th>
                 <th>Article</th>
                 <th>Comment</th>
@@ -83,13 +86,17 @@
         <tbody>
             {% for c in latest_comments %}
             <tr>
+                <td>{{ forloop.counter }}</td>
                 <td><strong>{{ c.user.name }}</strong></td>
                 <td>{{ c.article.title|truncatewords:5 }}</td>
                 <td>{{ c.content|truncatewords:8 }}</td>
                 <td>{{ c.timestamp|date:"d M" }}</td>
             </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;color:var(--text-3);">No comments found</td></tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
 {% endblock %}
