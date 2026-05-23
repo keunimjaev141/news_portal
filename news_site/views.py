@@ -14,8 +14,17 @@ def admin_required(view_func):
     def wrapped(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
-        if not (request.user.is_staff or request.user.is_superuser):
+        if not (request.user.is_superuser or request.user.groups.filter(name='Admin').exists()):
+            return redirect('home')
+        return view_func(request, *args, **kwargs)
+    return wrapped
+
+def journalist_required(view_func):
+    def wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated:
             return redirect('login')
+        if not (request.user.is_superuser or request.user.groups.filter(name__in=['Journalist', 'Admin']).exists()):
+            return redirect('home')
         return view_func(request, *args, **kwargs)
     return wrapped
 
@@ -37,7 +46,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            if user.is_staff or user.is_superuser:
+            if user.is_superuser or user.groups.filter(name='Admin').exists():
                 return redirect('custom_admin_dashboard')
             return redirect('home')
     return render(request, 'login.html', {'form': form})
@@ -144,26 +153,32 @@ def subscribe(request):
     return render(request, 'subscribe.html', {'form': form, 'success': success})
 
 
-@login_required(login_url='login')
+@journalist_required
 def article_create(request):
     form = ArticleForm()
     if request.method == 'POST':
         form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
+            journalist = getattr(request.user, 'journalist_profile', None)
             article = NewsArticle.objects.create(
                 title=form.cleaned_data['title'],
                 content=form.cleaned_data['content'],
                 category=form.cleaned_data['category'],
                 image=form.cleaned_data.get('image'),
                 created_by=request.user,
+                author=journalist
             )
             return redirect('article_detail', pk=article.pk)
     return render(request, 'article_create.html', {'form': form})
 
 
-@login_required(login_url='login')
+@journalist_required
 def article_edit(request, pk):
-    article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+    # Allow admins to edit any article, journalists only their own
+    if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
+        article = get_object_or_404(NewsArticle, pk=pk)
+    else:
+        article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
     form = ArticleForm(initial={
         'title': article.title,
         'content': article.content,
@@ -182,16 +197,21 @@ def article_edit(request, pk):
     return render(request, 'article_create.html', {'form': form, 'edit': True})
 
 
-@login_required(login_url='login')
+@journalist_required
 def article_delete(request, pk):
-    article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+    # Allow admins to delete any article, journalists only their own
+    if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
+        article = get_object_or_404(NewsArticle, pk=pk)
+    else:
+        article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+    
     if request.method == 'POST':
         article.delete()
         return redirect('home')
     return render(request, 'article_delete.html', {'article': article})
 
 
-@login_required(login_url='login')
+@journalist_required
 def my_articles(request):
     articles = NewsArticle.objects.filter(created_by=request.user).order_by('-published_date')
     return render(request, 'my_articles.html', {'articles': articles})

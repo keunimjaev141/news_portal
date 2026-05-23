@@ -3,6 +3,7 @@ from django.contrib.auth.models import User as AuthUser
 
 
 class Journalist(models.Model):
+    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, related_name='journalist_profile', null=True, blank=True)
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100, unique=True)
 

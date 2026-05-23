@@ -17,8 +17,8 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Journalist)
 class JournalistAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email')
-    search_fields = ('name', 'email')
+    list_display = ('name', 'email', 'user')
+    search_fields = ('name', 'email', 'user__username')
 
 
 @admin.register(Category)
