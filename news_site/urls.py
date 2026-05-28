@@ -23,5 +23,8 @@ urlpatterns = [
     path('my-admin/comments/', views.admin_comments, name='admin_comments'),
     path('my-admin/comments/<int:pk>/delete/', views.admin_comment_delete, name='admin_comment_delete'),
     path('my-admin/categories/', views.admin_categories, name='admin_categories'),
+    path('my-admin/categories/create/', views.admin_category_create, name='admin_category_create'),
+    path('my-admin/categories/<int:pk>/edit/', views.admin_category_edit, name='admin_category_edit'),
+    path('my-admin/categories/<int:pk>/delete/', views.admin_category_delete, name='admin_category_delete'),
     path('my-admin/subscriptions/', views.admin_subscriptions, name='admin_subscriptions'),
 ]

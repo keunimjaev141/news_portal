@@ -367,7 +367,11 @@ ul { list-style: none; }
     transition: opacity 0.2s, transform 0.2s;
     display: inline-block;
 }
-.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-primary:hover { 
+    opacity: 0.88; 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
 
 .action-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 

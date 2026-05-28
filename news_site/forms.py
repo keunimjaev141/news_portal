@@ -107,3 +107,20 @@ class ArticleForm(forms.Form):
         required=False,
         widget=forms.FileInput(attrs={'class': 'form-input'})
     )
+
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Category name (e.g. Technology)'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Brief description...',
+                'rows': 4
+            }),
+        }

@@ -8,7 +8,7 @@ from .models import (
     NewsArticle, Category, Comment, User,
     Journalist, Advertisement, Subscription
 )
-from .forms import CommentForm, SubscribeForm, RegisterForm, ArticleForm
+from .forms import CommentForm, SubscribeForm, RegisterForm, ArticleForm, CategoryForm
 
 def admin_required(view_func):
     def wrapped(request, *args, **kwargs):
@@ -294,3 +294,39 @@ def admin_categories(request):
 def admin_subscriptions(request):
     subs = Subscription.objects.select_related('user').order_by('-start_date')
     return render(request, 'custom_admin/subscriptions.html', {'subs': subs})
+
+
+@admin_required
+def admin_category_create(request):
+    form = CategoryForm()
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_categories')
+    return render(request, 'custom_admin/category_form.html', {'form': form, 'title': 'Create category'})
+
+
+@admin_required
+def admin_category_edit(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    form = CategoryForm(instance=category)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_categories')
+    return render(request, 'custom_admin/category_form.html', {'form': form, 'title': 'Edit category', 'edit': True})
+
+
+@admin_required
+def admin_category_delete(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        category.delete()
+        return redirect('admin_categories')
+    return render(request, 'custom_admin/confirm_delete.html', {
+        'obj': category,
+        'type': 'kategoriya',
+        'back_url': 'admin_categories'
+    })
