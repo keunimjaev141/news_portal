@@ -1,14 +1,32 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Home Page - NewsPortal{% endblock %}
+{% block title %}Bosh sahifa | NewsPortal{% endblock %}
+
+{% block meta_description %}NewsPortal — eng so'nggi yangiliklar, tahlillar va maqolalar{% endblock %}
+
+{% block meta_keywords %}yangiliklar, news portal, uzbekistan news{% endblock %}
+
+{% block og_title %}Home | NewsPortal{% endblock %}
+
+{% block og_description %}NewsPortal - the latest news, analysis, and articles{% endblock %}
+
+{% block og_image %}
+    {% if featured.image %}{{ request.scheme }}://{{ request.get_host }}{{ featured.image.url }}{% endif %}
+{% endblock %}
+
+{% block twitter_title %}Home | NewsPortal{% endblock %}
+
+{% block twitter_description %}NewsPortal - the latest news, analysis, and articles{% endblock %}
+
+{% block twitter_image %}
+    {% if featured.image %}{{ request.scheme }}://{{ request.get_host }}{{ featured.image.url }}{% endif %}
+{% endblock %}
 
 {% block content %}
-
 <!-- FEATURED ARTICLE -->
 {% if featured %}
 <section class="featured-section">
-    <a href="{% url 'article_detail' featured.pk %}" class="featured-card" {% if featured.image %}style="background-image: url('{{ featured.image.url }}'); background-size: cover; background-position: center;"{% endif %}>
+    <a href="{% url 'article_detail' featured.slug %}" class="featured-card" {% if featured.image %}style="background-image: url('{{ featured.image.url }}'); background-size: cover; background-position: center;"{% endif %}>
         <div class="featured-badge">⭐ TOP NEWS</div>
         <div class="featured-overlay"></div>
         <div class="featured-content">
@@ -65,7 +83,7 @@
                 </div>
                 <div class="article-card-body">
                     <h3 class="article-card-title">
-                        <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a>
+                        <a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a>
                     </h3>
                     <p class="article-card-excerpt">{{ article.content|truncatewords:18 }}</p>
                     <div class="article-card-meta">
@@ -73,7 +91,7 @@
                         <span>👁️ {{ article.views }}</span>
                         <span>📅 {{ article.published_date|date:"d M" }}</span>
                     </div>
-                    <a href="{% url 'article_detail' article.pk %}" class="article-read-more">Read more →</a>
+                    <a href="{% url 'article_detail' article.slug %}" class="article-read-more">Read more →</a>
                 </div>
             </article>
             {% empty %}
@@ -95,7 +113,7 @@
                 <li class="latest-item">
                     <div class="latest-num">{{ forloop.counter }}</div>
                     <div>
-                        <a href="{% url 'article_detail' article.pk %}" class="latest-link">{{ article.title|truncatewords:8 }}</a>
+                        <a href="{% url 'article_detail' article.slug %}" class="latest-link">{{ article.title|truncatewords:8 }}</a>
                         <p class="latest-date">📅 {{ article.published_date|date:"d M Y" }}</p>
                     </div>
                 </li>
@@ -109,7 +127,7 @@
             <ul class="category-list">
                 {% for cat in categories %}
                 <li>
-                    <a href="{% url 'category_articles' cat.pk %}" class="category-link">
+                    <a href="{% url 'category_articles' cat.slug %}" class="category-link">
                         <span>{{ cat.name }}</span>
                         <span class="cat-count">{{ cat.articles.count }}</span>
                     </a>

@@ -56,7 +56,7 @@
             {% for a in latest_articles %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td><strong><a href="{% url 'article_detail' a.pk %}" style="color:var(--text-1);">{{ a.title|truncatewords:6 }}</a></strong></td>
+                <td><strong><a href="{% url 'article_detail' a.slug %}" style="color:var(--text-1);">{{ a.title|truncatewords:6 }}</a></strong></td>
                 <td><span class="badge badge-accent">{{ a.category.name|default:"—" }}</span></td>
                 <td>👁️ {{ a.views }}</td>
                 <td>{{ a.published_date|date:"d M Y" }}</td>

@@ -1,8 +1,25 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}{{ article.title }} - NewsPortal{% endblock %}
+{% block title %}{{ article.title }} | NewsPortal{% endblock %}
 
+{% block meta_description %}{{ article.content|truncatewords:25 }}{% endblock %}
+
+{% block meta_keywords %}{{ article.category.name }}, yangiliklar, {{ article.title|truncatewords:5 }}{% endblock %}
+
+{% block og_title %}{{ article.title }}{% endblock %}
+
+{% block og_description %}{{ article.content|truncatewords:25 }}{% endblock %}
+
+{% block og_image %}
+    {% if article.image %}{{ request.scheme }}://{{ request.get_host }}{{ article.image.url }}{% endif %}
+{% endblock %}
+{% block twitter_title %}{{ article.title }}{% endblock %}
+
+{% block twitter_description %}{{ article.content|truncatewords:25 }}{% endblock %}
+
+{% block twitter_image %}
+    {% if article.image %}{{ request.scheme }}://{{ request.get_host }}{{ article.image.url }}{% endif %}
+{% endblock %}
 {% block content %}
 <div class="detail-layout">
 
@@ -13,14 +30,14 @@
             <img src="{{ article.image.url }}" alt="{{ article.title }}" class="article-detail-img">
             {% endif %}
             {% if article.category %}
-            <a href="{% url 'category_articles' article.category.pk %}" class="article-category-link">
+            <a href="{% url 'category_articles' article.category.slug %}" class="article-category-link">
                 {{ article.category.name }}
             </a>
             {% endif %}
             <h1 class="article-detail-title">{{ article.title }}</h1>
             <div class="article-detail-meta">
                 {% if article.author %}
-                <a href="{% url 'journalist_detail' article.author.pk %}" class="meta-author">
+                <a href="{% url 'journalist_detail' article.author.slug %}" class="meta-author">
                     ✍️ {{ article.author.name }}
                 </a>
                 {% endif %}
@@ -93,7 +110,7 @@
             <ul class="related-list">
                 {% for rel in related %}
                 <li class="related-item">
-                    <a href="{% url 'article_detail' rel.pk %}" class="related-link">
+                    <a href="{% url 'article_detail' rel.slug %}" class="related-link">
                         {{ rel.title|truncatewords:8 }}
                     </a>
                     <span class="related-date">{{ rel.published_date|date:"d M" }}</span>
@@ -112,7 +129,7 @@
                 <div>
                     <strong>{{ article.author.name }}</strong>
                     <p>{{ article.author.email }}</p>
-                    <a href="{% url 'journalist_detail' article.author.pk %}" class="author-link">All articles →</a>
+                    <a href="{% url 'journalist_detail' article.author.slug %}" class="author-link">All articles →</a>
                 </div>
             </div>
         </div>

@@ -28,14 +28,14 @@
                 </div>
                 <div class="article-card-body">
                     <h3 class="article-card-title">
-                        <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a>
+                        <a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a>
                     </h3>
                     <p class="article-card-excerpt">{{ article.content|truncatewords:18 }}</p>
                     <div class="article-card-meta">
                         <span>{% if article.author %}✍️ {{ article.author.name }}{% endif %}</span>
                         <span>👁️ {{ article.views }}</span>
                     </div>
-                    <a href="{% url 'article_detail' article.pk %}" class="article-read-more">Read more →</a>
+                    <a href="{% url 'article_detail' article.slug %}" class="article-read-more">Read more →</a>
                 </div>
             </article>
             {% empty %}
@@ -54,7 +54,7 @@
             <ul class="category-list">
                 {% for cat in categories %}
                 <li>
-                    <a href="{% url 'category_articles' cat.pk %}" class="category-link">
+                    <a href="{% url 'category_articles' cat.slug %}" class="category-link">
                         <span>{{ cat.name }}</span>
                         <span class="cat-count">{{ cat.articles.count }}</span>
                     </a>

@@ -24,7 +24,7 @@
                 <td>{{ forloop.counter }}</td>
                 <td><strong>{{ c.user.name }}</strong></td>
                 <td>
-                    <a href="{% url 'article_detail' c.article.pk %}" style="color:var(--accent);">
+                    <a href="{% url 'article_detail' c.article.slug %}" style="color:var(--accent);">
                         {{ c.article.title|truncatewords:5 }}
                     </a>
                 </td>

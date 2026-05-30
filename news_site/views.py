@@ -72,12 +72,12 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-def article_detail(request, pk):
-    article = get_object_or_404(NewsArticle, pk=pk)
+def article_detail(request, slug):
+    article = get_object_or_404(NewsArticle, slug=slug)
     article.views += 1
     article.save()
     comments = article.comments.select_related('user').all()
-    related = NewsArticle.objects.filter(category=article.category).exclude(pk=pk)[:4]
+    related = NewsArticle.objects.filter(category=article.category).exclude(pk=article.pk)[:4]
     ads = Advertisement.objects.filter(article=article)
     comment_form = CommentForm()
 
@@ -89,7 +89,7 @@ def article_detail(request, pk):
             content = comment_form.cleaned_data['content']
             user, _ = User.objects.get_or_create(email=email, defaults={'name': name})
             Comment.objects.create(user=user, article=article, content=content)
-            return redirect('article_detail', pk=pk)
+            return redirect('article_detail', slug=article.slug)
 
     context = {
         'article': article,
@@ -101,8 +101,8 @@ def article_detail(request, pk):
     return render(request, 'article_detail.html', context)
 
 
-def category_articles(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+def category_articles(request, slug):
+    category = get_object_or_404(Category, slug=slug)
     articles = NewsArticle.objects.filter(category=category).select_related('author')
     categories = Category.objects.all()
     context = {
@@ -113,8 +113,8 @@ def category_articles(request, pk):
     return render(request, 'category.html', context)
 
 
-def journalist_detail(request, pk):
-    journalist = get_object_or_404(Journalist, pk=pk)
+def journalist_detail(request, slug):
+    journalist = get_object_or_404(Journalist, slug=slug)
     articles = NewsArticle.objects.filter(author=journalist).order_by('-published_date')
     context = {
         'journalist': journalist,
@@ -168,17 +168,17 @@ def article_create(request):
                 created_by=request.user,
                 author=journalist
             )
-            return redirect('article_detail', pk=article.pk)
+            return redirect('article_detail', slug=article.slug)
     return render(request, 'article_create.html', {'form': form})
 
 
 @journalist_required
-def article_edit(request, pk):
+def article_edit(request, slug):
     # Allow admins to edit any article, journalists only their own
     if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
-        article = get_object_or_404(NewsArticle, pk=pk)
+        article = get_object_or_404(NewsArticle, slug=slug)
     else:
-        article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+        article = get_object_or_404(NewsArticle, slug=slug, created_by=request.user)
     form = ArticleForm(initial={
         'title': article.title,
         'content': article.content,
@@ -193,17 +193,17 @@ def article_edit(request, pk):
             if form.cleaned_data.get('image'):
                 article.image = form.cleaned_data['image']
             article.save()
-            return redirect('article_detail', pk=article.pk)
+            return redirect('article_detail', slug=article.slug)
     return render(request, 'article_create.html', {'form': form, 'edit': True})
 
 
 @journalist_required
-def article_delete(request, pk):
+def article_delete(request, slug):
     # Allow admins to delete any article, journalists only their own
     if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
-        article = get_object_or_404(NewsArticle, pk=pk)
+        article = get_object_or_404(NewsArticle, slug=slug)
     else:
-        article = get_object_or_404(NewsArticle, pk=pk, created_by=request.user)
+        article = get_object_or_404(NewsArticle, slug=slug, created_by=request.user)
     
     if request.method == 'POST':
         article.delete()
@@ -238,8 +238,8 @@ def admin_articles(request):
 
 
 @admin_required
-def admin_article_delete(request, pk):
-    article = get_object_or_404(NewsArticle, pk=pk)
+def admin_article_delete(request, slug):
+    article = get_object_or_404(NewsArticle, slug=slug)
     if request.method == 'POST':
         article.delete()
         return redirect('admin_articles')
@@ -308,8 +308,8 @@ def admin_category_create(request):
 
 
 @admin_required
-def admin_category_edit(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+def admin_category_edit(request, slug):
+    category = get_object_or_404(Category, slug=slug)
     form = CategoryForm(instance=category)
     if request.method == 'POST':
         form = CategoryForm(request.POST, instance=category)
@@ -320,8 +320,8 @@ def admin_category_edit(request, pk):
 
 
 @admin_required
-def admin_category_delete(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+def admin_category_delete(request, slug):
+    category = get_object_or_404(Category, slug=slug)
     if request.method == 'POST':
         category.delete()
         return redirect('admin_categories')

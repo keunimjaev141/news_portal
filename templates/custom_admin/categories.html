@@ -27,8 +27,8 @@
                 <td><span class="badge badge-accent">{{ cat.articles.count }}</span></td>
                 <td style="text-align: right;">
                     <div class="action-group" style="justify-content: flex-end;">
-                        <a href="{% url 'admin_category_edit' cat.pk %}" class="btn-accent">Edit</a>
-                        <a href="{% url 'admin_category_delete' cat.pk %}" class="btn-danger">Delete</a>
+                        <a href="{% url 'admin_category_edit' cat.slug %}" class="btn-accent">Edit</a>
+                        <a href="{% url 'admin_category_delete' cat.slug %}" class="btn-danger">Delete</a>
                     </div>
                 </td>
             </tr>

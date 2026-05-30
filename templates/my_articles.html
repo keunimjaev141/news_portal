@@ -16,7 +16,7 @@
         <img src="{{ article.image.url }}" alt="{{ article.title }}" class="my-article-img">
         {% endif %}
         <div class="my-article-body">
-            <h3><a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a></h3>
+            <h3><a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a></h3>
             <p>{{ article.content|truncatewords:20 }}</p>
             <div class="my-article-meta">
                 <span>📅 {{ article.published_date|date:"d M Y" }}</span>
@@ -25,8 +25,8 @@
             </div>
         </div>
         <div class="my-article-actions">
-            <a href="{% url 'article_edit' article.pk %}" class="btn-edit">✏️ Edit</a>
-            <a href="{% url 'article_delete' article.pk %}" class="btn-delete">🗑️ Delete</a>
+            <a href="{% url 'article_edit' article.slug %}" class="btn-edit">✏️ Edit</a>
+            <a href="{% url 'article_delete' article.slug %}" class="btn-delete">🗑️ Delete</a>
         </div>
     </div>
     {% endfor %}

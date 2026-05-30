@@ -29,14 +29,14 @@
             </div>
             <div class="article-card-body">
                 <h3 class="article-card-title">
-                    <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a>
+                    <a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a>
                 </h3>
                 <p class="article-card-excerpt">{{ article.content|truncatewords:15 }}</p>
                 <div class="article-card-meta">
                     <span>👁️ {{ article.views }}</span>
                     <span>📅 {{ article.published_date|date:"d M Y" }}</span>
                 </div>
-                <a href="{% url 'article_detail' article.pk %}" class="article-read-more">Read more →</a>
+                <a href="{% url 'article_detail' article.slug %}" class="article-read-more">Read more →</a>
             </div>
         </article>
         {% empty %}

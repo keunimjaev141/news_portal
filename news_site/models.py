@@ -1,11 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import User as AuthUser
+from django.utils.text import slugify
+import random
+import string
 
 
 class Journalist(models.Model):
     user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, related_name='journalist_profile', null=True, blank=True)
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
     email = models.CharField(max_length=100, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            if not base_slug:
+                base_slug = 'journalist'
+            slug = base_slug
+            while Journalist.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{''.join(random.choices(string.digits, k=4))}"
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -18,7 +33,19 @@ class Journalist(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            if not base_slug:
+                base_slug = 'category'
+            slug = base_slug
+            while Category.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{''.join(random.choices(string.digits, k=4))}"
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -51,6 +78,7 @@ class PortalCategory(models.Model):
 
 class NewsArticle(models.Model):
     title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
     content = models.TextField()
     image = models.ImageField(upload_to='articles/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='articles')
@@ -58,6 +86,17 @@ class NewsArticle(models.Model):
     created_by = models.ForeignKey(AuthUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='my_articles')
     published_date = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            if not base_slug:
+                base_slug = 'article'
+            slug = base_slug
+            while NewsArticle.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{''.join(random.choices(string.digits, k=4))}"
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
